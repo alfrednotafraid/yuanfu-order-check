@@ -54,10 +54,10 @@ CREATE TABLE `prod_order` (
   `更新时间` VARCHAR(64) NULL,
   `备注` VARCHAR(64) NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-ALTER TABLE `prod_order` ADD INDEX `idx_交期子单号` (`交期子单号`)
-ALTER TABLE `prod_order` ADD INDEX `idx_发货单号` (`发货单号`)
-ALTER TABLE `prod_order` ADD INDEX `idx_订单号` (`订单号`)
-ALTER TABLE `prod_order` ADD INDEX `idx_订单原单号` (`订单原单号`)
+ALTER TABLE `prod_order` ADD INDEX `idx_交期子单号` (`交期子单号`);
+ALTER TABLE `prod_order` ADD INDEX `idx_发货单号` (`发货单号`);
+ALTER TABLE `prod_order` ADD INDEX `idx_订单号` (`订单号`);
+ALTER TABLE `prod_order` ADD INDEX `idx_订单原单号` (`订单原单号`);
 
 -- 订单数据/物流订单.xlsx  (588 行)
 CREATE TABLE `logistics_order` (
@@ -85,10 +85,10 @@ CREATE TABLE `logistics_order` (
   `确认状态` VARCHAR(64) NULL,
   `关闭状态` VARCHAR(64) NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-ALTER TABLE `logistics_order` ADD INDEX `idx_发货单号` (`发货单号`)
-ALTER TABLE `logistics_order` ADD INDEX `idx_订单号` (`订单号`)
-ALTER TABLE `logistics_order` ADD INDEX `idx_订单原单号` (`订单原单号`)
-ALTER TABLE `logistics_order` ADD INDEX `idx_运输单号` (`运输单号`)
+ALTER TABLE `logistics_order` ADD INDEX `idx_发货单号` (`发货单号`);
+ALTER TABLE `logistics_order` ADD INDEX `idx_订单号` (`订单号`);
+ALTER TABLE `logistics_order` ADD INDEX `idx_订单原单号` (`订单原单号`);
+ALTER TABLE `logistics_order` ADD INDEX `idx_运输单号` (`运输单号`);
 
 -- 订单数据/配送订单.xlsx  (426 行)
 CREATE TABLE `delivery_order` (
@@ -115,9 +115,9 @@ CREATE TABLE `delivery_order` (
   `物品体积（方）` DECIMAL(18,4) NULL,
   `货品包装` VARCHAR(64) NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-ALTER TABLE `delivery_order` ADD INDEX `idx_发货单号` (`发货单号`)
-ALTER TABLE `delivery_order` ADD INDEX `idx_订单号` (`订单号`)
-ALTER TABLE `delivery_order` ADD INDEX `idx_运输单号` (`运输单号`)
+ALTER TABLE `delivery_order` ADD INDEX `idx_发货单号` (`发货单号`);
+ALTER TABLE `delivery_order` ADD INDEX `idx_订单号` (`订单号`);
+ALTER TABLE `delivery_order` ADD INDEX `idx_运输单号` (`运输单号`);
 
 -- 订单数据/配送订单（自提单）.xlsx  (31 行)
 CREATE TABLE `pickup_order` (
@@ -162,9 +162,9 @@ CREATE TABLE `pickup_order` (
   `备注` VARCHAR(64) NULL,
   `创建人` VARCHAR(64) NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-ALTER TABLE `pickup_order` ADD INDEX `idx_发货单号` (`发货单号`)
-ALTER TABLE `pickup_order` ADD INDEX `idx_订单号` (`订单号`)
-ALTER TABLE `pickup_order` ADD INDEX `idx_运输单号` (`运输单号`)
+ALTER TABLE `pickup_order` ADD INDEX `idx_发货单号` (`发货单号`);
+ALTER TABLE `pickup_order` ADD INDEX `idx_订单号` (`订单号`);
+ALTER TABLE `pickup_order` ADD INDEX `idx_运输单号` (`运输单号`);
 
 -- 货品编码/物流订单-货品编码.xlsx  (12017 行)
 CREATE TABLE `code_logistics` (
@@ -181,10 +181,10 @@ CREATE TABLE `code_logistics` (
   `件型` VARCHAR(64) NULL,
   `生产单号` VARCHAR(64) NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-ALTER TABLE `code_logistics` ADD INDEX `idx_发货单号` (`发货单号`)
-ALTER TABLE `code_logistics` ADD INDEX `idx_运输单号` (`运输单号`)
-ALTER TABLE `code_logistics` ADD INDEX `idx_箱码编码` (`箱码编码`)
-ALTER TABLE `code_logistics` ADD INDEX `idx_生产单号` (`生产单号`)
+ALTER TABLE `code_logistics` ADD INDEX `idx_发货单号` (`发货单号`);
+ALTER TABLE `code_logistics` ADD INDEX `idx_运输单号` (`运输单号`);
+ALTER TABLE `code_logistics` ADD INDEX `idx_箱码编码` (`箱码编码`);
+ALTER TABLE `code_logistics` ADD INDEX `idx_生产单号` (`生产单号`);
 
 -- 货品编码/配送（派送）订单-货品编码.xlsx  (8808 行)
 CREATE TABLE `code_delivery` (
@@ -201,10 +201,10 @@ CREATE TABLE `code_delivery` (
   `件型` VARCHAR(64) NULL,
   `生产单号` VARCHAR(64) NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-ALTER TABLE `code_delivery` ADD INDEX `idx_发货单号` (`发货单号`)
-ALTER TABLE `code_delivery` ADD INDEX `idx_运输单号` (`运输单号`)
-ALTER TABLE `code_delivery` ADD INDEX `idx_箱码编码` (`箱码编码`)
-ALTER TABLE `code_delivery` ADD INDEX `idx_生产单号` (`生产单号`)
+ALTER TABLE `code_delivery` ADD INDEX `idx_发货单号` (`发货单号`);
+ALTER TABLE `code_delivery` ADD INDEX `idx_运输单号` (`运输单号`);
+ALTER TABLE `code_delivery` ADD INDEX `idx_箱码编码` (`箱码编码`);
+ALTER TABLE `code_delivery` ADD INDEX `idx_生产单号` (`生产单号`);
 
 -- 货品编码/配送（自提）订单-货品编码.xlsx  (364 行)
 CREATE TABLE `code_pickup` (
@@ -221,7 +221,7 @@ CREATE TABLE `code_pickup` (
   `件型` VARCHAR(64) NULL,
   `生产单号` VARCHAR(64) NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-ALTER TABLE `code_pickup` ADD INDEX `idx_发货单号` (`发货单号`)
-ALTER TABLE `code_pickup` ADD INDEX `idx_运输单号` (`运输单号`)
-ALTER TABLE `code_pickup` ADD INDEX `idx_箱码编码` (`箱码编码`)
-ALTER TABLE `code_pickup` ADD INDEX `idx_生产单号` (`生产单号`)
+ALTER TABLE `code_pickup` ADD INDEX `idx_发货单号` (`发货单号`);
+ALTER TABLE `code_pickup` ADD INDEX `idx_运输单号` (`运输单号`);
+ALTER TABLE `code_pickup` ADD INDEX `idx_箱码编码` (`箱码编码`);
+ALTER TABLE `code_pickup` ADD INDEX `idx_生产单号` (`生产单号`);

@@ -78,10 +78,12 @@ def main():
             if name in INDEX_COLS and typ.startswith(("VARCHAR", "BIGINT", "DATETIME")):
                 idxs.append(f"ALTER TABLE `{table}` ADD INDEX `idx_{name}` (`{name}`)")
         ddl = f"CREATE TABLE `{table}` (\n{col_defs}\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;"
-        ddl_out.append(f"-- {rel}  ({len(data)} 行)\n{ddl}\n" + "\n".join(idxs) + "\n")
+        ddl_out.append(f"-- {rel}  ({len(data)} 行)\n{ddl}\n" + "\n".join(s + ";" for s in idxs) + "\n")
 
         cur.execute(f"DROP TABLE IF EXISTS `{table}`")
         cur.execute(ddl)
+        for s in idxs:
+            cur.execute(s)
         ph = ",".join(["%s"] * len(header))
         sql = f"INSERT INTO `{table}` ({','.join('`' + h + '`' for h in header)}) VALUES ({ph})"
         for i in range(0, len(data), 1000):
