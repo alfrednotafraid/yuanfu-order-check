@@ -24,19 +24,35 @@ def resolve_ship_codes(cur, order_no):
         "SELECT DISTINCT `发货单号` FROM logistics_order WHERE `订单号`=%s OR `发货单号`=%s OR `订单原单号`=%s",
         (order_no, order_no, order_no))
     rows = [r["发货单号"] for r in cur.fetchall() if r["发货单号"]]
-    return (rows, "logistics_order") if rows else ([], "not_found")
+    if rows:
+        return rows, "logistics_order"
+    # 兜底：订单存在但发货单号全空 -> "未发货"场景（由调用方按订单号取子单）
+    cur.execute("SELECT 1 FROM prod_order WHERE `订单号`=%s OR `订单原单号`=%s LIMIT 1",
+                (order_no, order_no))
+    if cur.fetchone():
+        return [], "prod_order_unbound"
+    return [], "not_found"
+
+
+def _prod_subs(cur, ships, order_no):
+    """取交期子单：按发货单号命中已绑定子单，再按订单号补上未绑定的（未发货/部分发货判定依赖）。
+    DISTINCT 防 OR 条件重复命中同一行；样例箱码/单号经查无跨单碰撞。"""
+    ph = ",".join(["%s"] * len(ships)) if ships else "NULL"
+    cur.execute(
+        f"""SELECT DISTINCT `交期子单号`,`发货单号`,`齐套状态`,`入库状态`,`到货状态`,`作废标识`
+            FROM prod_order
+            WHERE `发货单号` IN ({ph}) OR `订单号`=%s OR `订单原单号`=%s""",
+        list(ships) + [order_no, order_no])
+    return [r for r in cur.fetchall() if r["作废标识"] != "作废"]
 
 
 # ---------- 场景 1/2：状态聚合 ----------
 
 def production_check(cur, order_no):
     ships, path = resolve_ship_codes(cur, order_no)
-    if not ships:
+    subs = _prod_subs(cur, ships, order_no)
+    if not subs:
         return {"verdict": "未找到", "message": f"单号 {order_no} 在生产订单中无记录（解析路径 {path}）"}
-    ph = ",".join(["%s"] * len(ships))
-    cur.execute(
-        f"SELECT `交期子单号`,`发货单号`,`齐套状态`,`作废标识` FROM prod_order WHERE `发货单号` IN ({ph})", ships)
-    subs = [r for r in cur.fetchall() if r["作废标识"] != "作废"]
     done = sum(1 for s in subs if s["齐套状态"] == "齐套")
     null = sum(1 for s in subs if not s["齐套状态"])
     if done == len(subs):
@@ -52,13 +68,9 @@ def production_check(cur, order_no):
 
 def shipment_check(cur, order_no):
     ships, path = resolve_ship_codes(cur, order_no)
-    if not ships:
+    subs = _prod_subs(cur, ships, order_no)
+    if not subs:
         return {"verdict": "未找到", "message": f"单号 {order_no} 无记录（解析路径 {path}）"}
-    ph = ",".join(["%s"] * len(ships))
-    cur.execute(
-        f"""SELECT `交期子单号`,`发货单号`,`入库状态`,`到货状态`,`作废标识`
-            FROM prod_order WHERE `发货单号` IN ({ph})""", ships)
-    subs = [r for r in cur.fetchall() if r["作废标识"] != "作废"]
     bound = sum(1 for s in subs if s["发货单号"])
     inbound_ok = sum(1 for s in subs if s["入库状态"] == "已入库")
     unbound = [s["交期子单号"] for s in subs if not s["发货单号"]]

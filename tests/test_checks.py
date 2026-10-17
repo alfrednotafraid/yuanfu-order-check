@@ -12,6 +12,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."
 
 import requests  # noqa: E402
 
+from app import checks  # noqa: E402
 from app.db import get_conn  # noqa: E402
 
 BASE = "http://localhost:8000"
@@ -32,6 +33,32 @@ def codes_of(sql, arg):
 
 def post(path, body):
     return requests.post(f"{BASE}{path}", json=body, timeout=10).json()
+
+
+def test_unbound_branches():
+    """未发货/部分发货分支：样例数据全为已绑定，用事务内虚构子单验证后回滚。"""
+    conn = get_conn()
+    cur = conn.cursor()
+    conn.begin()
+    try:
+        cur.execute("""INSERT INTO prod_order
+            (`订单号`,`订单原单号`,`交期子单号`,`发货单号`,`齐套状态`,`入库状态`,`作废标识`)
+            VALUES ('TEST999','TEST999','SUB99A','MDTEST99','齐套','已入库',''),
+                   ('TEST999','TEST999','SUB99B',NULL,NULL,NULL,''),
+                   ('TEST888','TEST888','SUB88A',NULL,NULL,NULL,''),
+                   ('TEST888','TEST888','SUB88B',NULL,NULL,NULL,'')""")
+        s9 = checks.shipment_check(cur, "TEST999")
+        s8 = checks.shipment_check(cur, "TEST888")
+        p9 = checks.production_check(cur, "TEST999")
+        results = [
+            s9["verdict"] == "部分发货" and s9["detail"]["unbound_subs"] == ["SUB99B"],
+            s8["verdict"] == "未发货" and s8["detail"]["bound"] == 0,
+            p9["verdict"] == "部分生产",
+        ]
+    finally:
+        conn.rollback()
+        conn.close()
+    return all(results), results
 
 
 def main():
@@ -64,10 +91,18 @@ def main():
          lambda r: r["detail"]["ok"] is True),
     ]
 
+    ub_ok, ub_detail = test_unbound_branches()
+    cases.append(("发货-未发货/部分发货分支(事务回滚)", None, None, lambda r: ub_ok))
+    if not ub_ok:
+        print(f"       未发货分支断言明细: {ub_detail}")
+
     failed = 0
     for name, path, body, check in cases:
         try:
-            ok = check(post(path, body))
+            if path is None:
+                ok = check(None)
+            else:
+                ok = check(post(path, body))
         except Exception as e:  # noqa: BLE001
             ok, name = False, f"{name} ({e})"
         print(f"{'PASS' if ok else 'FAIL'}  {name}")

@@ -28,6 +28,10 @@ def main():
         p = checks.production_check(cur, o)
         s = checks.shipment_check(cur, o)
         prod_cnt[p["verdict"]] += 1
+        if "未找到" in (p["verdict"], s["verdict"]):
+            abnormal.append((o, p["verdict"], s["message"]))
+            ship_cnt["未找到"] += 1
+            continue
         ship_cnt[s["verdict"] + "/" + s["detail"]["warehouse"]["verdict"]] += 1
         if p["verdict"] != "全量完成" or s["verdict"] != "全量发货" or s["detail"]["warehouse"]["verdict"] != "到齐":
             abnormal.append((o, p["verdict"], s["message"]))
