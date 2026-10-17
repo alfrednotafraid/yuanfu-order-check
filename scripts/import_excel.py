@@ -10,11 +10,12 @@ import os
 import openpyxl
 import pymysql
 
-SRC = r"D:\newDesktop\远孚物流齐套校核AI助手\素材"
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT_SQL = os.path.join(HERE, "..", "sql", "schema.sql")
 _cp = configparser.ConfigParser()
 _cp.read(os.path.join(HERE, "..", "config.ini"), encoding="utf-8")
+# 素材目录默认取项目同级 ../素材，可在 config.ini [import] src 覆盖
+SRC = _cp["import"]["src"] if _cp.has_option("import", "src") else os.path.normpath(os.path.join(HERE, "..", "..", "素材"))
 DB = dict(host=_cp["mysql"]["host"], port=int(_cp["mysql"]["port"]),
           user=_cp["mysql"]["user"], password=_cp["mysql"]["password"], charset="utf8mb4")
 SCHEMA = _cp["mysql"]["database"]
