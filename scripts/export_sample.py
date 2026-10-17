@@ -33,7 +33,8 @@ def main():
             continue
         cols = ",".join(f"`{c}`" for c in rows[0].keys())
         vals = ["(" + ",".join(cur.connection.escape(v) for v in r.values()) + ")" for r in rows]
-        parts.append(f"DELETE FROM `{table}`;\nINSERT INTO `{table}` ({cols}) VALUES\n" + ",\n".join(vals) + ";")
+        # 注意：不生成 DELETE/TRUNCATE——样例文件只允许导入新建空库，避免误删主库数据
+        parts.append(f"INSERT INTO `{table}` ({cols}) VALUES\n" + ",\n".join(vals) + ";")
         print(f"{table}: {len(rows)} rows")
     conn.close()
     sql = "\n\n".join(parts) + "\n"

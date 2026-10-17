@@ -24,7 +24,7 @@ python tests/test_checks.py
 # 4. 生成跑批报告
 python scripts/run_report.py
 ```
-样例数据：`mysql yuanfu_check < sql/sample_data.sql`（含 1 个完整订单链路，电话已脱敏，可跑通全部测试）。
+样例数据：新建空库后 `mysql 新库名 < sql/schema.sql && mysql 新库名 < sql/sample_data.sql`，再把 config.ini 指到该库（含 1 个完整订单链路，电话已脱敏，可跑通全部测试）。样例文件不含任何 DELETE/TRUNCATE，但请勿导入已有数据的库（会叠加重复行）。
 
 ## 五个说明（按招聘方投递要求）
 1. **解决了什么问题**：交付链四环节校核从人工逐单核对变为秒级自动比对，差异精确到箱码。
